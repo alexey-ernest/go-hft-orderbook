@@ -1,6 +1,9 @@
 package types
 
-import "testing"
+import (
+	"testing"
+	"math/rand"
+)
 
 func TestRedBlackEmpty(t *testing.T) {
 	rb := NewRedBlackBST()
@@ -9,288 +12,237 @@ func TestRedBlackEmpty(t *testing.T) {
 	}
 }
 
-// func TestRedBlackBasic(t *testing.T) {
-// 	st := NewRedBlackBST()
-// 	for i := 0; i < 10; i+=1 {
-// 		k := string('a' + i)
-// 		st.Put(k, i)
-// 	}
+func TestRedBlackBasic(t *testing.T) {
+	st := NewRedBlackBST()
+	keys := make([]float64, 0)
+	for i := 0; i < 10; i+=1 {
+		k := rand.Float64()
+		keys = append(keys, k)
+		st.Put(k, nil)
+	}
 
-// 	if st.Size() != 10 {
-// 		t.Errorf("size should equals 10, got %d", st.Size())
-// 	}
-// 	if st.IsEmpty() {
-// 		t.Errorf("st should not be empty")	
-// 	}
+	if st.Size() != 10 {
+		t.Errorf("size should equals 10, got %d", st.Size())
+	}
+	if st.IsEmpty() {
+		t.Errorf("st should not be empty")	
+	}
 
-// 	for i := 0; i < 10; i+=1 {
-// 		k := string('a' + i)
-// 		if !st.Contains(k) {
-// 			t.Errorf("st should contain the key %q", k)
-// 		}
-// 		if st.Get(k) != i {
-// 			t.Errorf("value %s != %s", st.Get(k), i)
-// 		}
-// 	}
-// }
+	for _, k := range keys { 
+		if !st.Contains(k) {
+			t.Errorf("st should contain the key %0.8f", k)
+		}
+	}
+}
 
-// func TestRedBlackHeight(t *testing.T) {
-// 	st := NewRedBlackBST()
-// 	n := 1024
-// 	for i := 0; i < n; i+=1 {
-// 		k := string(i)
-// 		st.Put(k, i)
-// 	}
+func TestRedBlackHeight(t *testing.T) {
+	st := NewRedBlackBST()
+	n := 100000
+	for i := 0; i < n; i+=1 {
+		k := rand.Float64()
+		st.Put(k, nil)
+	}
 
-// 	if st.Size() != n {
-// 		t.Errorf("size should equals %d, got %d", n, st.Size())
-// 	}
-// 	if st.IsEmpty() {
-// 		t.Errorf("st should not be empty")	
-// 	}
+	if st.Size() != n {
+		t.Errorf("size should equals %d, got %d", n, st.Size())
+	}
+	if st.IsEmpty() {
+		t.Errorf("st should not be empty")	
+	}
 
-// 	height := st.Height()
-// 	if height < 10 || height > 20 {
-// 		t.Errorf("red black bst height should be in range lgN <= height <= 2*lgN, in our case from 10 to 20, but we got %d", height)
-// 	}
-// }
+	height := st.Height()
+	if height < 17 || height > 34 {
+		t.Errorf("red black bst height should be in range lgN <= height <= 2*lgN, in our case from 17 to 34, but we got %d", height)
+	}
+}
 
-// func TestRedBlackLeipzig1M(t *testing.T) {
+func TestRedBlackMinMax(t *testing.T) {
+	st := NewRedBlackBST()
+	for i := 0; i < 10; i+=1 {
+		st.Put(float64(10 - i), nil)
+	}
 
-// 	file, err := os.Open("leipzig1M.txt")
-//     if err != nil {
-//         panic(err)
-//     }
-//     defer file.Close()
+	min := 1.0
+	if st.Min() != min {
+		t.Errorf("min %0.8f != %0.8f", st.Min(), min)
+	}
 
-//     scanner := bufio.NewScanner(file)
-//     st := NewRedBlackBST()
-//     n := 0
-//     for scanner.Scan() {
-//         line := scanner.Text()
-        
-//         words := strings.Fields(line)
-//         n += len(words)
-        
-//         for _, w := range words {
-//         	if !st.Contains(w) {
-//         		st.Put(w, 1)
-//         	} else {
-//         		st.Put(w, st.Get(w) + 1)
-//         	}
-//         }
-//     }
+	max := 10.0
+	if st.Max() != max {
+		t.Errorf("min %0.8f != %0.8f", st.Max(), max)
+	}
+}
 
-//     if err := scanner.Err(); err != nil {
-//         panic(err)
-//     }
+func TestRedBlackFloor(t *testing.T) {
+	st := NewRedBlackBST()
+	for i := 0; i < 10; i += 1 {
+		k := float64(20 - 2*i)
+		st.Put(k, nil)
+	}
 
-//     allwords := 622098
-//     if n != allwords {
-//     	t.Errorf("number of all words should be %d, got %d", allwords, n)
-//     }
+	keymiss := 3.0
+	flmiss := 2.0
+	if st.Floor(keymiss) != flmiss {
+		t.Errorf("floor != %0.8f", st.Floor(keymiss))
+	}
 
-//     m := 69321
-//     if st.Size() != m {
-// 		t.Errorf("size should equals %d, got %d", m, st.Size())
-// 	}
+	keyhit := 10.0
+	if st.Floor(keyhit) != keyhit {
+		t.Errorf("floor != %0.8f", st.Floor(keyhit))
+	}
+}
 
-// 	height := st.Height()
-// 	if height < 16 || height > 32 {
-// 		t.Errorf("red black bst height should be in range lgN <= height <= 2*lgN, in our case from 16 to 32, but we got %d", height)
-// 	}
+func TestRedBlackCeiling(t *testing.T) {
+	st := NewRedBlackBST()
+	for i := 0; i < 10; i += 1 {
+		k := float64(20 - 2*i)
+		st.Put(k, nil)
+	}
 
-// 	if !st.IsRedBlack() {
-// 		t.Errorf("certification failed")
-// 	}
-// }
+	keymiss := 3.0
+	clmiss := 4.0
+	if st.Ceiling(keymiss) != clmiss {
+		t.Errorf("ceiling != %0.8f", st.Ceiling(keymiss))
+	}
 
-// func TestRedBlackMinMax(t *testing.T) {
-// 	st := NewRedBlackBST()
-// 	for i := 0; i < 10; i+=1 {
-// 		k := string('a' + 9 - i)
-// 		st.Put(k, i)
-// 	}
+	keyhit := 10.0
+	if st.Ceiling(keyhit) != keyhit {
+		t.Errorf("ceiling != %0.8f", st.Ceiling(keyhit))
+	}
+}
 
-// 	min := string('a')
-// 	if st.Min() != min {
-// 		t.Errorf("min %q != %q", st.Min(), min)
-// 	}
+func TestRedBlackSelect(t *testing.T) {
+	st := NewRedBlackBST()
+	for i := 0; i < 10; i+=1 {
+		k := float64(10 - i)
+		st.Put(k, nil)
+	}
 
-// 	max := string('a' + 9)
-// 	if st.Max() != max {
-// 		t.Errorf("min %q != %q", st.Max(), max)
-// 	}
-// }
+	key := 3.0
+	if st.Select(2.0) != key {
+		t.Errorf("element with rank=2 should be %0.8f", key)
+	}
 
-// func TestRedBlackFloor(t *testing.T) {
-// 	st := NewRedBlackBST()
-// 	for i := 0; i < 10; i += 1 {
-// 		k := string('a' + 20 - 2*i)
-// 		st.Put(k, i)
-// 	}
+	key = 10.0
+	if st.Select(9.0) != key {
+		t.Errorf("element with rank=9 should be %0.8f", key)
+	}
+}
 
-// 	keymiss := string('a' + 3)
-// 	flmiss := string('a' + 2)
-// 	if st.Floor(keymiss) != flmiss {
-// 		t.Errorf("floor != %s", st.Floor(keymiss))
-// 	}
+func TestRedBlackRank(t *testing.T) {
+	st := NewRedBlackBST()
+	keys := make([]float64, 0)
+	for i := 0; i < 10; i+=1 {
+		k := float64(10 - i)
+		keys = append(keys, k)
+		st.Put(k, nil)
+	}
 
-// 	keyhit := string('a' + 10)
-// 	if st.Floor(keyhit) != keyhit {
-// 		t.Errorf("floor != %s", st.Floor(keyhit))
-// 	}
-// }
+	for i := range keys {
+		k := st.Select(i)
+		if st.Rank(k) != i {
+			t.Errorf("rank of %0.8f != %d", k, i)
+		}
+	}
 
-// func TestRedBlackCeiling(t *testing.T) {
-// 	st := NewRedBlackBST()
-// 	for i := 0; i < 10; i += 1 {
-// 		k := string('a' + 20 - 2*i)
-// 		st.Put(k, i)
-// 	}
+	if st.Rank(11.0) != len(keys) {
+		t.Errorf("rank of new maximum should equal to the number of nodes in the tree")
+	}
 
-// 	keymiss := string('a' + 3)
-// 	clmiss := string('a' + 4)
-// 	if st.Ceiling(keymiss) != clmiss {
-// 		t.Errorf("ceiling != %s", st.Ceiling(keymiss))
-// 	}
+	if st.Rank(11.0) != st.Rank(12.0) {
+		t.Errorf("rank of new maximum should not depend on the new maximum concrete value")
+	}
+}
 
-// 	keyhit := string('a' + 10)
-// 	if st.Ceiling(keyhit) != keyhit {
-// 		t.Errorf("ceiling != %s", st.Ceiling(keyhit))
-// 	}
-// }
+func TestRedBlackKeys(t *testing.T) {
+	st := NewRedBlackBST()
+	for i := 0; i < 10; i+=1 {
+		k := float64(10 - i)
+		st.Put(k, nil)
+	}
 
-// func TestRedBlackSelect(t *testing.T) {
-// 	st := NewRedBlackBST()
-// 	for i := 0; i < 10; i+=1 {
-// 		k := string('a' + 10 - i)
-// 		st.Put(k, i)
-// 	}
+	lo := 3.0
+	hi := 6.0
+	keys := st.Keys(lo, hi)
+	if len(keys) != 4 {
+		t.Errorf("keys len should equals 4, %+v", keys)
+	}
 
-// 	key := string('a' + 3)
-// 	if st.Select(2) != key {
-// 		t.Errorf("element with rank=2 should be %s", key)
-// 	}
+	if keys[0] != lo {
+		t.Errorf("first key should be %0.8f", lo)
+	}
 
-// 	key = string('a' + 10)
-// 	if st.Select(9) != key {
-// 		t.Errorf("element with rank=9 should be %s", key)
-// 	}
-// }
+	if keys[len(keys)-1] != hi {
+		t.Errorf("last key should be %0.8f", hi)
+	}
 
-// func TestRedBlackRank(t *testing.T) {
-// 	st := NewRedBlackBST()
-// 	nodes := []string{"S", "E", "X", "A", "R", "C", "H", "M"}
-// 	for i, v := range nodes {
-// 		st.Put(v, i)
-// 	}
+	for i := 1; i < len(keys); i += 1 {
+		if keys[i] < keys[i-1] {
+			t.Errorf("non-decreasing keys order validation failed")
+		}
+	}
+}
 
-// 	for i := range nodes {
-// 		k := st.Select(i)
-// 		if st.Rank(k) != i {
-// 			t.Errorf("rank of %q != %d", k, i)
-// 		}
-// 	}
+func TestRedBlackDeleteMin(t *testing.T) {
+	st := NewRedBlackBST()
+	for i := 0; i < 10; i+=1 {
+		k := float64(10 - i)
+		st.Put(k, nil)
+	}
 
-// 	if st.Rank("Y") != len(nodes) {
-// 		t.Errorf("rank of new maximum should equal to the number of nodes in the tree")
-// 	}
+	st.DeleteMin()
+	if st.Size() != 9 {
+		t.Errorf("tree size should shrink")
+	}
 
-// 	if st.Rank("Y") != st.Rank("Z") {
-// 		t.Errorf("rank of new maximum should not depend on the new maximum concrete value")
-// 	}
-// }
+	if st.Contains(1.0) {
+		t.Errorf("minimum element should be removed from the tree")
+	}
 
-// func TestRedBlackKeys(t *testing.T) {
-// 	st := NewRedBlackBST()
-// 	for i := 0; i < 10; i+=1 {
-// 		k := string('a' + 10 - i)
-// 		st.Put(k, i)
-// 	}
+	if !st.IsRedBlack() {
+		t.Errorf("certification failed")
+	}
+}
 
-// 	lo := string('a' + 3)
-// 	hi := string('a' + 6)
-// 	keys := st.Keys(lo, hi)
-// 	if len(keys) != 4 {
-// 		t.Errorf("keys len should equals 4, %+v", keys)
-// 	}
+func TestRedBlackDeleteMax(t *testing.T) {
+	st := NewRedBlackBST()
+	for i := 0; i < 10; i+=1 {
+		k := float64(i)
+		st.Put(k, nil)
+	}
 
-// 	if keys[0] != lo {
-// 		t.Errorf("first key should be %s", lo)
-// 	}
+	st.DeleteMax()
+	if st.Size() != 9 {
+		t.Errorf("tree size should shrink")
+	}
 
-// 	if keys[len(keys)-1] != hi {
-// 		t.Errorf("last key should be %s", hi)
-// 	}
+	if st.Contains(9.0) {
+		t.Errorf("minimum element should be removed from the tree")
+	}
 
-// 	for i := 1; i < len(keys); i += 1 {
-// 		if keys[i] < keys[i-1] {
-// 			t.Errorf("non-decreasing keys order validation failed")
-// 		}
-// 	}
-// }
+	if !st.IsRedBlack() {
+		t.Errorf("certification failed")
+	}
+}
 
-// func TestRedBlackDeleteMin(t *testing.T) {
-// 	st := NewRedBlackBST()
-// 	for i := 0; i < 10; i+=1 {
-// 		k := string('a' + 10 - i)
-// 		st.Put(k, i)
-// 	}
+func TestRedBlackDelete(t *testing.T) {
+	st := NewRedBlackBST()
+	for i := 0; i < 10; i+=1 {
+		k := float64(i)
+		st.Put(k, nil)
+	}
 
-// 	st.DeleteMin()
-// 	if st.Size() != 9 {
-// 		t.Errorf("tree size should shrink")
-// 	}
+	key := 5.0
+	st.Delete(key)
+	if st.Size() != 9 {
+		t.Errorf("tree size should shrink")
+	}
 
-// 	if st.Contains(string('a' + 1)) {
-// 		t.Errorf("minimum element should be removed from the tree")
-// 	}
+	if st.Contains(key) {
+		t.Errorf("minimum element should be removed from the tree")
+	}
 
-// 	if !st.IsRedBlack() {
-// 		t.Errorf("certification failed")
-// 	}
-// }
-
-// func TestRedBlackDeleteMax(t *testing.T) {
-// 	st := NewRedBlackBST()
-// 	for i := 0; i < 10; i+=1 {
-// 		k := string('a' + i)
-// 		st.Put(k, i)
-// 	}
-
-// 	st.DeleteMax()
-// 	if st.Size() != 9 {
-// 		t.Errorf("tree size should shrink")
-// 	}
-
-// 	if st.Contains(string('a' + 9)) {
-// 		t.Errorf("minimum element should be removed from the tree")
-// 	}
-
-// 	if !st.IsRedBlack() {
-// 		t.Errorf("certification failed")
-// 	}
-// }
-
-// func TestRedBlackDelete(t *testing.T) {
-// 	st := NewRedBlackBST()
-// 	for i := 0; i < 10; i+=1 {
-// 		k := string('a' + i)
-// 		st.Put(k, i)
-// 	}
-
-// 	key := string('a' + 5)
-// 	st.Delete(key)
-// 	if st.Size() != 9 {
-// 		t.Errorf("tree size should shrink")
-// 	}
-
-// 	if st.Contains(key) {
-// 		t.Errorf("minimum element should be removed from the tree")
-// 	}
-
-// 	if !st.IsRedBlack() {
-// 		t.Errorf("certification failed")
-// 	}
-// }
+	if !st.IsRedBlack() {
+		t.Errorf("certification failed")
+	}
+}
