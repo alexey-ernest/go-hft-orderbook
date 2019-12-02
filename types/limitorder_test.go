@@ -26,6 +26,9 @@ func TestLimitOrderAddOrder(t *testing.T) {
 	if l.Size() != 1 {
 		t.Errorf("it should have size = 1")
 	}
+	if o.Limit != &l {
+		t.Errorf("Parent Limit link should be set for an order")
+	}
 }
 
 func TestLimitOrderAddMultipleOrders(t *testing.T) {
