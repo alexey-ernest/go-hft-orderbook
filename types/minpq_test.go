@@ -142,3 +142,7 @@ func BenchmarkMinPQ5kLevelsRandomInsertWithCaching(b *testing.B) {
 func BenchmarkMinPQ10kLevelsRandomInsertWithCaching(b *testing.B) {
 	benchmarkMinPQLimitedRandomInsertWithCaching(10000, b)
 }
+
+func BenchmarkMinPQ20kLevelsRandomInsertWithCaching(b *testing.B) {
+	benchmarkMinPQLimitedRandomInsertWithCaching(20000, b)
+}

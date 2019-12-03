@@ -332,11 +332,11 @@ func TestRedBlackPutDeleteLinkedListOrder(t *testing.T) {
 	}
 }
 
-func BenchmarkRedBlackLimitedRandomInsertWithCaching(b *testing.B) {
+func benchmarkRedBlackLimitedRandomInsertWithCaching(n int, b *testing.B) {
 	st := NewRedBlackBST()
 
 	// maximum number of levels in average is 10k
-	limitslist := make([]float64, 10000)
+	limitslist := make([]float64, n)
 	for i := range limitslist {
 		limitslist[i] = rand.Float64()
 	}
@@ -381,3 +381,16 @@ func BenchmarkRedBlackLimitedRandomInsertWithCaching(b *testing.B) {
 		}
 	}
 }
+
+func BenchmarkRedBlack5kLevelsRandomInsertWithCaching(b *testing.B) {
+	benchmarkRedBlackLimitedRandomInsertWithCaching(5000, b)
+}
+
+func BenchmarkRedBlack10kLevelsRandomInsertWithCaching(b *testing.B) {
+	benchmarkRedBlackLimitedRandomInsertWithCaching(10000, b)
+}
+
+func BenchmarkRedBlack20kLevelsRandomInsertWithCaching(b *testing.B) {
+	benchmarkRedBlackLimitedRandomInsertWithCaching(20000, b)
+}
+
