@@ -30,7 +30,7 @@ func (this *LimitOrder) Enqueue(o *Order) {
 	this.totalVolume += o.Volume
 }
 
-func (this *LimitOrder) Dequeue() *Order{
+func (this *LimitOrder) Dequeue() *Order {
 	if this.orders.IsEmpty() {
 		return nil
 	}
@@ -38,4 +38,29 @@ func (this *LimitOrder) Dequeue() *Order{
 	o := this.orders.Dequeue()
 	this.totalVolume -= o.Volume
 	return o
+}
+
+func (this *LimitOrder) Delete(o *Order) {
+	if o.Limit != this {
+		panic("order does not belong to the limit")
+	}
+
+	prev := o.Prev
+	next := o.Next
+	if prev != nil {
+		prev.Next = next
+	}
+	if next != nil {
+		next.Prev = prev
+	}
+	o.Next = nil
+	o.Prev = nil
+	o.Limit = nil
+	this.totalVolume -= o.Volume
+}
+
+func (this *LimitOrder) Clear() {
+	q := NewOrdersQueue()
+	this.orders = &q
+	this.totalVolume = 0
 }

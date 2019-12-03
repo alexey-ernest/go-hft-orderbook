@@ -7,4 +7,5 @@ type Order struct {
 	Next *Order
 	Prev *Order
 	Limit *LimitOrder
+	BidOrAsk bool
 }
