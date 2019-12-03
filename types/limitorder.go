@@ -3,8 +3,8 @@ package types
 // Limit price orders combined as a FIFO queue
 type LimitOrder struct {
 	Price float64
-	Orders *ordersQueue
-
+	
+	orders *ordersQueue
 	totalVolume float64
 }
 
@@ -12,7 +12,7 @@ func NewLimitOrder(price float64) LimitOrder {
 	q := NewOrdersQueue()
 	return LimitOrder{
 		Price: price,
-		Orders: &q,
+		orders: &q,
 	}
 }
 
@@ -21,21 +21,21 @@ func (this *LimitOrder) TotalVolume() float64 {
 }
 
 func (this *LimitOrder) Size() int {
-	return this.Orders.Size()
+	return this.orders.Size()
 }
 
 func (this *LimitOrder) Enqueue(o *Order) {
-	this.Orders.Enqueue(o)
+	this.orders.Enqueue(o)
 	o.Limit = this
 	this.totalVolume += o.Volume
 }
 
 func (this *LimitOrder) Dequeue() *Order{
-	if this.Orders.IsEmpty() {
+	if this.orders.IsEmpty() {
 		return nil
 	}
 
-	o := this.Orders.Dequeue()
+	o := this.orders.Dequeue()
 	this.totalVolume -= o.Volume
 	return o
 }

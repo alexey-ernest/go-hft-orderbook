@@ -284,3 +284,48 @@ func TestRedBlackDelete(t *testing.T) {
 		t.Errorf("certification failed")
 	}
 }
+
+func TestRedBlackPutLinkedListOrder(t *testing.T) {
+	st := NewRedBlackBST()
+	for i := 0; i < 100; i+=1 {
+		k := rand.Float64()
+		st.Put(k, nil)
+	}
+
+	min := st.MinPointer()
+	for p := min; p != nil && p.Next != nil; p = p.Next {
+		if p.Next.Key < p.Key {
+			t.Errorf("incorrect keys order")
+			break
+		}
+	}
+}
+
+func TestRedBlackPutDeleteLinkedListOrder(t *testing.T) {
+	st := NewRedBlackBST()
+	n := 1000
+	for i := 0; i < n; i += 1 {
+		k := rand.Float64()
+		st.Put(k, nil)
+	}
+
+	k := int(float64(n)*0.3)
+	for i := 0; i < k; i += 1 {
+		st.DeleteMin()
+		k := st.Select(rand.Intn(st.Size()))
+		st.Delete(k)
+		st.DeleteMax()
+	}
+
+	if st.Size() != n-3*k {
+		t.Errorf("incorrect tree size %d", st.Size())
+	}
+
+	min := st.MinPointer()
+	for p := min; p != nil && p.Next != nil; p = p.Next {
+		if p.Next.Key < p.Key {
+			t.Errorf("incorrect keys order")
+			break
+		}
+	}
+}
