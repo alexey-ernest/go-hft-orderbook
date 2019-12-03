@@ -3,6 +3,7 @@ package types
 import (
 	"testing"
 	"math/rand"
+	//"fmt"
 )
 
 func TestRedBlackEmpty(t *testing.T) {
@@ -331,31 +332,48 @@ func TestRedBlackPutDeleteLinkedListOrder(t *testing.T) {
 	}
 }
 
-func BenchmarkRedBlackRandomInsert(b *testing.B) {
+func BenchmarkRedBlackLimitedRandomInsertWithCaching(b *testing.B) {
 	st := NewRedBlackBST()
 
 	// maximum number of levels in average is 10k
-	levels := make([]float64, 10000)
-	for i := range levels {
-		levels[i] = rand.Float64()
+	limitslist := make([]float64, 10000)
+	for i := range limitslist {
+		limitslist[i] = rand.Float64()
 	}
 	
-	// preallocate objects
-	limits := make([]*LimitOrder, b.N)
+	// preallocate empty orders
+	orders := make([]*Order, 0, b.N)
 	for i := 0; i < b.N; i += 1 {
-		o := &Order{
-			Id: i,
-			Volume: rand.Float64(),
-		}
-		lo := NewLimitOrder(levels[rand.Intn(len(levels))])
-		lo.Enqueue(o)
-		limits[i] = &lo
+		orders = append(orders, &Order{})
 	}
 
 	// measure insertion time
 	b.ResetTimer()
+
+	limitscache := make(map[float64]*LimitOrder)
 	for i := 0; i < b.N; i += 1 {
-		lo := limits[i]
-		st.Put(lo.Price, lo)
+		// create a new order
+		o := orders[i]
+		o.Id = i
+		o.Volume = rand.Float64()
+
+		// set the price
+		price := limitslist[rand.Intn(len(limitslist))]
+
+		// append order to the limit price
+		if limitscache[price] != nil {
+			// append to the existing limit in cache
+			limitscache[price].Enqueue(o)
+		} else {
+			// new limit
+			l := NewLimitOrder(price)
+			l.Enqueue(o)
+
+			// caching limit
+			limitscache[price] = &l
+			
+			// inserting into tree
+			st.Put(l.Price, &l)
+		}
 	}
 }
