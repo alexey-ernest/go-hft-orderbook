@@ -73,6 +73,44 @@ func TestRedBlackMinMax(t *testing.T) {
 	}
 }
 
+func TestRedBlackMinMaxCachedOnDelete(t *testing.T) {
+	st := NewRedBlackBST()
+	for i := 0; i < 100; i+=1 {
+		st.Put(float64(100 - i), nil)
+	}
+
+	min := 1.0
+	if st.Min() != min {
+		t.Errorf("min %0.8f != %0.8f", st.Min(), min)
+	}
+
+	max := 100.0
+	if st.Max() != max {
+		t.Errorf("min %0.8f != %0.8f", st.Max(), max)
+	}
+
+	st.DeleteMin()
+	st.DeleteMin()
+	for i := 3; i < 20; i += 1 {
+		st.Delete(float64(i))
+	}
+	st.DeleteMax()
+	st.DeleteMax()
+	for i := 98; i > 70; i -= 1 {
+		st.Delete(float64(i))
+	}
+
+	min = 20.0
+	if st.Min() != min {
+		t.Errorf("min %0.8f != %0.8f", st.Min(), min)
+	}
+
+	max = 70.0
+	if st.Max() != max {
+		t.Errorf("min %0.8f != %0.8f", st.Max(), max)
+	}
+}
+
 func TestRedBlackFloor(t *testing.T) {
 	st := NewRedBlackBST()
 	for i := 0; i < 10; i += 1 {

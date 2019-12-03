@@ -17,6 +17,8 @@ type nodeRedBlack struct {
 
 type redBlackBST struct {
 	root *nodeRedBlack
+	minC *nodeRedBlack // cached min/max keys for O(1) access
+	maxC *nodeRedBlack
 }
 
 func NewRedBlackBST() redBlackBST {
@@ -142,12 +144,23 @@ func (t *redBlackBST) Put(key float64, value *LimitOrder) {
 func (t *redBlackBST) put(n *nodeRedBlack, key float64, value *LimitOrder) *nodeRedBlack {
 	if n == nil {
 		// search miss, creating a new node with a red link as a part of 3- or 4-node
-		return &nodeRedBlack{
+		n := &nodeRedBlack{
 			key: key,
 			value: value,
 			size: 1,
 			isRed: true,
 		}
+
+		if t.minC == nil || key < t.minC.key {
+			// new min
+			t.minC = n
+		}
+		if t.maxC == nil || key > t.maxC.key {
+			// new max
+			t.maxC = n
+		}
+
+		return n
 	}
 
 	if n.key == key {
@@ -252,7 +265,12 @@ func (t *redBlackBST) is23(n *nodeRedBlack) bool {
 
 func (t *redBlackBST) Min() float64 {
 	t.panicIfEmpty()
-	return t.min(t.root).key
+	return t.minC.key
+}
+
+func (t *redBlackBST) MinValue() *LimitOrder {
+	t.panicIfEmpty()
+	return t.minC.value
 }
 
 func (t *redBlackBST) min(n *nodeRedBlack) *nodeRedBlack {
@@ -265,7 +283,12 @@ func (t *redBlackBST) min(n *nodeRedBlack) *nodeRedBlack {
 
 func (t *redBlackBST) Max() float64 {
 	t.panicIfEmpty()
-	return t.max(t.root).key
+	return t.maxC.key
+}
+
+func (t *redBlackBST) MaxValue() *LimitOrder {
+	t.panicIfEmpty()
+	return t.maxC.value
 }
 
 func (t *redBlackBST) max(n *nodeRedBlack) *nodeRedBlack {
@@ -430,7 +453,13 @@ func (t *redBlackBST) deleteMin(n *nodeRedBlack) *nodeRedBlack {
 		n = t.makeLeftRed(n)
 	}
 
+	left := n.left
 	n.left = t.deleteMin(n.left)
+
+	// updating global min
+	if t.minC == left && n.left == nil {
+		t.minC = n
+	}
 
 	// we have to restore balance of the tree moving from bottom to top now
 	if t.isRed(n.right) {
@@ -486,8 +515,14 @@ func (t *redBlackBST) deleteMax(n *nodeRedBlack) *nodeRedBlack {
 		n = t.makeRightRed(n)
 	}
 
+	right := n.right
 	n.right = t.deleteMax(n.right)
 
+	// updating global max
+	if t.maxC == right && n.right == nil {
+		t.maxC = n
+	}
+	
 	// balancing back on the way from bottom to top
 	if t.isRed(n.right) {
 		n = t.rotateLeft(n)
@@ -521,7 +556,14 @@ func (t *redBlackBST) delete(n *nodeRedBlack, key float64) *nodeRedBlack {
 		if !t.isRed(n.left) && !t.isRed(n.left.left) {
 			n = t.makeLeftRed(n)
 		}
+
+		left := n.left
 		n.left = t.delete(n.left, key)
+		if t.minC == left && n.left == nil {
+			// min was deleted, updating global min
+			t.minC = n
+		}
+
 	} else {
 		// checking current node and right sub-tree if required
 		if t.isRed(n.left) {
@@ -536,12 +578,18 @@ func (t *redBlackBST) delete(n *nodeRedBlack, key float64) *nodeRedBlack {
 		}
 
 		if n.key == key {
+			// removing a node from the middle of the tree
 			rightMin := t.min(n.right)
 			n.key = rightMin.key
 			n.value = rightMin.value
 			n.right = t.deleteMin(n.right)
 		} else {
+			right := n.right
 			n.right = t.delete(n.right, key)
+			if t.maxC == right && n.right == nil {
+				// max was deleted, updating global max
+				t.maxC = n
+			}
 		}
 	}
 
