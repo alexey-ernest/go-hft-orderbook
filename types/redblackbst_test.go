@@ -309,6 +309,7 @@ func TestRedBlackPutDeleteLinkedListOrder(t *testing.T) {
 		st.Put(k, nil)
 	}
 
+	// deleting from both ends and in the middle 90% of the nodes
 	k := int(float64(n)*0.3)
 	for i := 0; i < k; i += 1 {
 		st.DeleteMin()
@@ -327,5 +328,34 @@ func TestRedBlackPutDeleteLinkedListOrder(t *testing.T) {
 			t.Errorf("incorrect keys order")
 			break
 		}
+	}
+}
+
+func BenchmarkRedBlackRandomInsert(b *testing.B) {
+	st := NewRedBlackBST()
+
+	// maximum number of levels in average is 10k
+	levels := make([]float64, 10000)
+	for i := range levels {
+		levels[i] = rand.Float64()
+	}
+	
+	// preallocate objects
+	limits := make([]*LimitOrder, b.N)
+	for i := 0; i < b.N; i += 1 {
+		o := &Order{
+			Id: i,
+			Volume: rand.Float64(),
+		}
+		lo := NewLimitOrder(levels[rand.Intn(len(levels))])
+		lo.Enqueue(o)
+		limits[i] = &lo
+	}
+
+	// measure insertion time
+	b.ResetTimer()
+	for i := 0; i < b.N; i += 1 {
+		lo := limits[i]
+		st.Put(lo.Price, lo)
 	}
 }
