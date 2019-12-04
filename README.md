@@ -9,4 +9,8 @@ Golang implementation of a Limit Order Book (LOB) for high frequency trading in 
 * GetVolumeAtLimit – O(1)
 
 ## Performance
-* Random generated insertion with limited number of price levels (~10K) on average MacBook Pro: ~200ns/op
+* Random generated insertion with limited number of price levels (10K levels) on average MacBook Pro: ~200ns/op or ~5M op/s
+
+## TODO
+* Object pool
+* Real data for benchmarks
