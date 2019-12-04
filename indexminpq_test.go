@@ -1,4 +1,4 @@
-package types
+package hftorderbook
 
 import (
 	"testing"
@@ -6,9 +6,9 @@ import (
 	//"fmt"
 )
 
-func TestMinPQOne(t *testing.T) {
-	minpq := NewMinPQ(10)
-	minpq.Insert(5.0)
+func TestIndexMinPQOne(t *testing.T) {
+	minpq := NewIndexMinPQ(10)
+	minpq.Insert(0, 5.0)
 	res := minpq.Top()
 
 	if res != 5.0 {
@@ -16,10 +16,10 @@ func TestMinPQOne(t *testing.T) {
 	}
 }
 
-func TestMinPQTwo(t *testing.T) {
-	minpq := NewMinPQ(10)
-	minpq.Insert(6.0)
-	minpq.Insert(5.0)
+func TestIndexMinPQTwo(t *testing.T) {
+	minpq := NewIndexMinPQ(10)
+	minpq.Insert(0, 6.0)
+	minpq.Insert(1, 5.0)
 	
 	res := [2]float64{}
 	res[0] = minpq.Top()
@@ -32,11 +32,11 @@ func TestMinPQTwo(t *testing.T) {
 	}
 }
 
-func TestMinPQThree(t *testing.T) {
-	minpq := NewMinPQ(10)
-	minpq.Insert(6.0)
-	minpq.Insert(5.0)
-	minpq.Insert(4.0)
+func TestIndexMinPQThree(t *testing.T) {
+	minpq := NewIndexMinPQ(10)
+	minpq.Insert(0, 6.0)
+	minpq.Insert(1, 5.0)
+	minpq.Insert(2, 4.0)
 	
 	res := [3]float64{}
 	res[0] = minpq.Top()
@@ -56,13 +56,15 @@ func TestMinPQThree(t *testing.T) {
 	}
 }
 
-func TestMinPQRandom(t *testing.T) {
-	minpq := NewMinPQ(100)
+func TestIndexMinPQRandom(t *testing.T) {
+	minpq := NewIndexMinPQ(100)
+	emptyindex := 0
 	for i := 0; i < 1000; i += 1 {
+		emptyindex = i
 		if minpq.Size() == 100 {
-			minpq.DelTop()
+			emptyindex = minpq.DelTop()
 		}
-		minpq.Insert(float64(rand.Intn(100)))
+		minpq.Insert(emptyindex, float64(rand.Intn(100)))
 	}
 
 	res := [100]float64{}
@@ -78,18 +80,15 @@ func TestMinPQRandom(t *testing.T) {
 	for i := 1; i < 100; i += 1 {
 		if res[i] < res[i-1] {
 			t.Errorf("invalid order")
-			break
 		}
 	}
 }
 
+func BenchmarkIndexMinPQLimitedRandomInsertWithCaching(b *testing.B) {
+	pq := NewIndexMinPQ(10000)
 
-
-func benchmarkMinPQLimitedRandomInsertWithCaching(n int, b *testing.B) {
-	pq := NewMinPQ(n)
-
-	// maximum number of levels in average is ~10k
-	limitslist := make([]float64, n)
+	// maximum number of levels in average is 10k
+	limitslist := make([]float64, 10000)
 	for i := range limitslist {
 		limitslist[i] = rand.Float64()
 	}
@@ -130,19 +129,7 @@ func benchmarkMinPQLimitedRandomInsertWithCaching(n int, b *testing.B) {
 			limitscache[price] = &l
 			
 			// inserting into heap
-			pq.Insert(price)
+			pq.Insert(len(limitscache)-1, price)
 		}
 	}
-}
-
-func BenchmarkMinPQ5kLevelsRandomInsertWithCaching(b *testing.B) {
-	benchmarkMinPQLimitedRandomInsertWithCaching(5000, b)
-}
-
-func BenchmarkMinPQ10kLevelsRandomInsertWithCaching(b *testing.B) {
-	benchmarkMinPQLimitedRandomInsertWithCaching(10000, b)
-}
-
-func BenchmarkMinPQ20kLevelsRandomInsertWithCaching(b *testing.B) {
-	benchmarkMinPQLimitedRandomInsertWithCaching(20000, b)
 }

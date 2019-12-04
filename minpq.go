@@ -1,4 +1,4 @@
-package types
+package hftorderbook
 
 // Mininum oriented Priority Queue
 type minPQ struct {

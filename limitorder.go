@@ -1,9 +1,5 @@
 package hftorderbook
 
-import (
-	. "github.com/alexey-ernest/go-hft-orderbook/types"
-)
-
 // Limit price orders combined as a FIFO queue
 type LimitOrder struct {
 	Price float64

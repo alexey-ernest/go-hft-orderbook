@@ -1,8 +1,4 @@
-package types
-
-import (
-	. "github.com/alexey-ernest/go-hft-orderbook"
-)
+package hftorderbook
 
 // Doubly linked orders queue
 // TODO: this should be compared with ring buffer queue performance
