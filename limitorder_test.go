@@ -1,6 +1,7 @@
-package types
+package hftorderbook
 
 import (
+	. "github.com/alexey-ernest/go-hft-orderbook/types"
 	"math/rand"
 	"testing"
 )

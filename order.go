@@ -1,4 +1,4 @@
-package types
+package hftorderbook
 
 // Single Order in an order book, as a node in a LimitOrder FIFO queue
 type Order struct {

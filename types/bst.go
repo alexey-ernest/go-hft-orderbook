@@ -1,6 +1,9 @@
 package types
 
-import "fmt"
+import (
+	. "github.com/alexey-ernest/go-hft-orderbook"
+	"fmt"
+)
 
 // Simple Binary Search Tree, not self-balancing, good for random input
 

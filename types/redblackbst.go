@@ -1,6 +1,9 @@
 package types
 
-import "fmt"
+import (
+	. "github.com/alexey-ernest/go-hft-orderbook"
+	"fmt"
+)
 
 // A self-balancing Binary Search Tree with 2*lgN worst case garantees for
 // search, put, delete, min, max, select, rank, floor, ceiling operations.

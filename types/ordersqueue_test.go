@@ -1,6 +1,7 @@
 package types
 
 import (
+	. "github.com/alexey-ernest/go-hft-orderbook"
 	"testing"
 )
 

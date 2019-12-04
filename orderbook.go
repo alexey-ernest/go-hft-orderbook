@@ -1,6 +1,10 @@
-package types
+package hftorderbook
 
-import "fmt"
+import (
+	. "github.com/alexey-ernest/go-hft-orderbook"
+	. "github.com/alexey-ernest/go-hft-orderbook/types"
+	"fmt"
+)
 
 // maximum limits per orderbook side to pre-allocate memory
 const MaxLimitsNum int = 10000
