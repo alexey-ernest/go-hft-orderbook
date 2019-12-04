@@ -2,6 +2,7 @@ package types
 
 import (
 	"testing"
+	"math"
 	"math/rand"
 	//"fmt"
 )
@@ -84,6 +85,25 @@ func TestOrderbookAddAndCancel(t *testing.T) {
 	b.Cancel(bid2)
 	if b.GetBestBid() != 1.0 {
 		t.Errorf("best bid should be 1.0 now")
+	}
+}
+
+func TestGetVolumeAtLimit(t *testing.T) {
+	b := NewOrderbook()
+	bid1 := &Order{
+		Id: 1,
+		BidOrAsk: true,
+		Volume: 0.1,
+	}
+	bid2 := &Order{
+		Id: 2,
+		BidOrAsk: true,
+		Volume: 0.2,
+	}
+	b.Add(1.0, bid1)
+	b.Add(1.0, bid2)
+	if math.Abs(b.GetVolumeAtBidLimit(1.0) - 0.3) > 0.0000001 {
+		t.Errorf("invalid volume at limit: %0.8f", b.GetVolumeAtBidLimit(1.0))
 	}
 }
 
