@@ -53,6 +53,22 @@ func (this *Orderbook) Add(price float64, o *Order) {
 	limit.Enqueue(o)
 }
 
+func (this *Orderbook) Cancel(o *Order) {
+	limit := o.Limit
+	limit.Delete(o)
+	
+	if limit.Size() == 0 {
+		// remove the limit if there are no orders
+		if o.BidOrAsk {
+			this.Bids.Delete(limit.Price)
+			delete(this.bidLimitsCache, limit.Price)
+		} else {
+			this.Asks.Delete(limit.Price)
+			delete(this.askLimitsCache, limit.Price)
+		}
+	}
+}
+
 func (this *Orderbook) ClearBidLimit(price float64) {
 	this.clearLimit(price, true)
 }

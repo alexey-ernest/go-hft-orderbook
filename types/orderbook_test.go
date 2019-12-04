@@ -81,7 +81,7 @@ func TestOrderbookAddAndCancel(t *testing.T) {
 	if b.GetBestBid() != 2.0 {
 		t.Errorf("best bid should be 2.0")
 	}
-	b.DeleteBidLimit(2.0)
+	b.Cancel(bid2)
 	if b.GetBestBid() != 1.0 {
 		t.Errorf("best bid should be 1.0 now")
 	}
