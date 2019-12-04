@@ -46,3 +46,25 @@ func (this *ordersQueue) Dequeue() *Order {
 	this.size--
 	return head
 }
+
+func (this *ordersQueue) Delete(o *Order) {
+	prev := o.Prev
+	next := o.Next
+	if prev != nil {
+		prev.Next = next
+	}
+	if next != nil {
+		next.Prev = prev
+	}
+	o.Next = nil
+	o.Prev = nil
+
+	this.size--
+
+	if this.head == o {
+		this.head = next
+	}
+	if this.tail == o {
+		this.tail = prev
+	}
+}

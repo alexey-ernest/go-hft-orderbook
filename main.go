@@ -5,9 +5,14 @@ import (
 )
 
 func NewOrderbook() OrderbookAPI {
+	bids := types.NewRedBlackBST()
+	asks := types.NewRedBlackBST()
+
 	return types.Orderbook{
-		bidLimitsCache: make(map[float64]*LimitOrder),
-		askLimitsCache: make(map[float64]*LimitOrder),
-		ordersCache: make(map[int]*Order),
+		Bids: &bids,
+		Asks: &asks,
+
+		bidLimitsCache: make(map[float64]*types.LimitOrder, types.MaxLimitsNum),
+		askLimitsCache: make(map[float64]*types.LimitOrder, types.MaxLimitsNum),
 	}
 }

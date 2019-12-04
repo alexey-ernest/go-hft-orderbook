@@ -393,4 +393,3 @@ func BenchmarkRedBlack10kLevelsRandomInsertWithCaching(b *testing.B) {
 func BenchmarkRedBlack20kLevelsRandomInsertWithCaching(b *testing.B) {
 	benchmarkRedBlackLimitedRandomInsertWithCaching(20000, b)
 }
-

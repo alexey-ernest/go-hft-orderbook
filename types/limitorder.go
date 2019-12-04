@@ -45,16 +45,7 @@ func (this *LimitOrder) Delete(o *Order) {
 		panic("order does not belong to the limit")
 	}
 
-	prev := o.Prev
-	next := o.Next
-	if prev != nil {
-		prev.Next = next
-	}
-	if next != nil {
-		next.Prev = prev
-	}
-	o.Next = nil
-	o.Prev = nil
+	this.orders.Delete(o)
 	o.Limit = nil
 	this.totalVolume -= o.Volume
 }

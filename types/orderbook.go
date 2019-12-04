@@ -2,13 +2,27 @@ package types
 
 import "fmt"
 
+// maximum limits per orderbook side to pre-allocate memory
+const MaxLimitsNum int = 10000
+
 type Orderbook struct {
 	Bids *redBlackBST
 	Asks *redBlackBST
 
 	bidLimitsCache map[float64]*LimitOrder
 	askLimitsCache map[float64]*LimitOrder
-	ordersCache map[int]*Order
+}
+
+func NewOrderbook() Orderbook {
+	bids := NewRedBlackBST()
+	asks := NewRedBlackBST()
+	return Orderbook{
+		Bids: &bids,
+		Asks: &asks,
+
+		bidLimitsCache: make(map[float64]*LimitOrder, MaxLimitsNum),
+		askLimitsCache: make(map[float64]*LimitOrder, MaxLimitsNum),
+	}
 }
 
 func (this *Orderbook) Add(price float64, o *Order) {
@@ -25,7 +39,7 @@ func (this *Orderbook) Add(price float64, o *Order) {
 		l := NewLimitOrder(price)
 		limit = &l
 
-		// insert into the corresponding BST and caching
+		// insert into the corresponding BST and cache
 		if o.BidOrAsk {
 			this.Bids.Put(price, limit)
 			this.bidLimitsCache[price] = limit
@@ -35,25 +49,8 @@ func (this *Orderbook) Add(price float64, o *Order) {
 		}
 	}
 
-	// caching order
-	this.ordersCache[o.Id] = o
-
 	// add order to the limit
 	limit.Enqueue(o)
-}
-
-func (this *Orderbook) Cancel(id int) {
-	o := this.ordersCache[id] 
-	if o == nil {
-		panic(fmt.Sprintf("there is no such order with an Id %d", id))
-	}
-
-	// remove order from the limit
-	limit := o.Limit
-	limit.Delete(o)
-
-	// clear cache
-	delete(this.ordersCache, id)
 }
 
 func (this *Orderbook) ClearBidLimit(price float64) {
@@ -119,4 +116,12 @@ func (this *Orderbook) GetBestBid() float64 {
 
 func (this *Orderbook) GetBestOffer() float64 {
 	return this.Asks.Min()
+}
+
+func (this *Orderbook) BLength() int {
+	return len(this.bidLimitsCache)
+}
+
+func (this *Orderbook) ALength() int {
+	return len(this.askLimitsCache)
 }

@@ -7,9 +7,6 @@ type OrderbookAPI interface {
 	// Add an order to a price level: O(LogM) for a new price level, O(1) for existing
 	Add(float64, *types.Order)
 
-	// Cancel an order: O(1)
-	Cancel(int)
-
 	// Clear a limit: O(1)
 	ClearBidLimit(float64)
 	ClearAskLimit(float64)
@@ -27,4 +24,7 @@ type OrderbookAPI interface {
 
 	// O(1)
 	GetBestOffer() float64
+
+	BLength() int
+	ALength() int
 }
