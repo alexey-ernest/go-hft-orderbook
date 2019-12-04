@@ -1,7 +1,7 @@
 package hftorderbook
 
 import (
-	"./types"
+	"github.com/alexey-ernest/go-hft-orderbook/types"
 )
 
 func NewOrderbook() OrderbookAPI {
