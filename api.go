@@ -1,6 +1,6 @@
 package hftorderbook
 
-import types
+import "./types"
 
 type OrderbookAPI interface {
 	
