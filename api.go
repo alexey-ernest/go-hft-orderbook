@@ -1,6 +1,8 @@
 package hftorderbook
 
-import "github.com/alexey-ernest/go-hft-orderbook/types"
+import (
+	"github.com/alexey-ernest/go-hft-orderbook/types"
+)
 
 type OrderbookAPI interface {
 	
