@@ -2,6 +2,7 @@ package hftorderbook
 
 import (
 	"fmt"
+	"sync"
 )
 
 // maximum limits per orderbook side to pre-allocate memory
@@ -13,6 +14,7 @@ type Orderbook struct {
 
 	bidLimitsCache map[float64]*LimitOrder
 	askLimitsCache map[float64]*LimitOrder
+	pool *sync.Pool
 }
 
 func NewOrderbook() Orderbook {
@@ -24,6 +26,12 @@ func NewOrderbook() Orderbook {
 
 		bidLimitsCache: make(map[float64]*LimitOrder, MaxLimitsNum),
 		askLimitsCache: make(map[float64]*LimitOrder, MaxLimitsNum),
+		pool: &sync.Pool {
+			New: func()interface{} {
+				limit := NewLimitOrder(0.0)
+				return &limit
+			},
+		},
 	}
 }
 
@@ -37,9 +45,9 @@ func (this *Orderbook) Add(price float64, o *Order) {
 	}
 
 	if limit == nil {
-		// creating new limit
-		l := NewLimitOrder(price)
-		limit = &l
+		// getting a new limit from pool
+		limit = this.pool.Get().(*LimitOrder)
+		limit.Price = price
 
 		// insert into the corresponding BST and cache
 		if o.BidOrAsk {
@@ -68,6 +76,9 @@ func (this *Orderbook) Cancel(o *Order) {
 			this.Asks.Delete(limit.Price)
 			delete(this.askLimitsCache, limit.Price)
 		}
+
+		// put it back to the pool
+		this.pool.Put(limit)
 	}
 }
 
@@ -95,13 +106,32 @@ func (this *Orderbook) clearLimit(price float64, bidOrAsk bool) {
 }
 
 func (this *Orderbook) DeleteBidLimit(price float64) {
+	limit := this.bidLimitsCache[price]
+	if limit == nil {
+		return
+	}
+
 	this.deleteLimit(price, true)
 	delete(this.bidLimitsCache, price)
+
+	// put limit back to the pool
+	limit.Clear()
+	this.pool.Put(limit)
+
 }
 
 func (this *Orderbook) DeleteAskLimit(price float64) {
+	limit := this.bidLimitsCache[price]
+	if limit == nil {
+		return
+	}
+
 	this.deleteLimit(price, false)
 	delete(this.askLimitsCache, price)
+
+	// put limit back to the pool
+	limit.Clear()
+	this.pool.Put(limit)
 }
 
 func (this *Orderbook) deleteLimit(price float64, bidOrAsk bool) {
