@@ -121,7 +121,7 @@ func (this *Orderbook) DeleteBidLimit(price float64) {
 }
 
 func (this *Orderbook) DeleteAskLimit(price float64) {
-	limit := this.bidLimitsCache[price]
+	limit := this.askLimitsCache[price]
 	if limit == nil {
 		return
 	}
