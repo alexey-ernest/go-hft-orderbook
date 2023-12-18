@@ -25,6 +25,7 @@ func (this *ordersQueue) Enqueue(o *Order) {
 	this.tail = o
 	if tail != nil {
 		tail.Next = o
+		o.Prev = tail
 	}
 	if this.head == nil {
 		this.head = o
