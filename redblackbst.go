@@ -502,6 +502,10 @@ func (t *redBlackBST) deleteMin(n *nodeRedBlack) *nodeRedBlack {
 			t.minC = next
 		}
 
+		if t.maxC == n {
+			t.maxC = prev
+		}
+
 		return n.right
 	}
 
